@@ -7,7 +7,7 @@
 namespace CS3500.FormulaTests;
 
 using System.Security.Cryptography;
-using CS3500.Formula1; // Change this using statement to use different formula implementations.
+using CS3500.Formula3; // Change this using statement to use different formula implementations.
 
 /// <summary>
 ///   <para>
@@ -29,57 +29,6 @@ public class FormulaSyntaxTests
     ///     This test makes sure the right kind of exception is thrown
     ///     when trying to create a formula with no tokens.
     ///   </para>
-    ///   <remarks>
-    ///     <list type="bullet">
-    ///       <item>
-    ///         We use the _ (discard) notation because the formula object
-    ///         is not used after that point in the method.  Note: you can also
-    ///         use _ when a method must match an interface but does not use
-    ///         some of the required arguments to that method.
-    ///       </item>
-    ///       <item>
-    ///         string.Empty is often considered best practice (rather than using "") because it
-    ///         is explicit in intent (e.g., perhaps the coder forgot to but something in "").
-    ///       </item>
-    ///       <item>
-    ///         The name of a test method should follow the MS standard:
-    ///         https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices
-    ///       </item>
-    ///       <item>
-    ///         All methods should be documented, but perhaps not to the same extent
-    ///         as this one.  The remarks here are for your educational
-    ///         purposes (i.e., a developer would assume another developer would know these
-    ///         items) and would be superfluous in your code.
-    ///       </item>
-    ///       <item>
-    ///         In 2025, the MSTest framework has been updated to include the ability to
-    ///         check for exceptions using the Assert.ThrowsExactly method (thus on a line
-    ///         by line basis inside of a test).  This replaces the old way of
-    ///         using the [ExpectedException] attribute which also would tell the test
-    ///         that the code should throw an exception, and if it doesn't an error has occurred;
-    ///         i.e., the correct implementation of the constructor should result
-    ///         in this exception being thrown based on the given poorly formed formula.
-    ///         You can remove the commented out code below once you understand the difference.
-    ///       </item>
-    ///       <item>
-    ///         When using the ThrowsExactly method, you must use a lambda expression. A lambda
-    ///         expression is a concise way to represent an anonymous function that can contain expressions
-    ///         and statements.  We will learn more about lambda expressions later in the course.
-    ///       </item>
-    ///       <item>
-    ///         When testing a constructor, and where you don't need the result of the constructor,
-    ///         you can use the discard notation (i.e., an underscore):
-    ///         <example>
-    ///           <code>
-    ///             _ = new Formula( "5+5" );
-    ///           </code>
-    ///         </example>
-    ///       </item>
-    ///       <item>
-    ///         Once you understand all of the above, you can remove the comments.
-    ///       </item>
-    ///     </list>
-    ///   </remarks>
     /// </summary>
     [TestMethod]
     public void FormulaConstructor_TestNoTokens_Invalid()
@@ -87,47 +36,70 @@ public class FormulaSyntaxTests
         Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula(string.Empty));
     }
 
-    /// <summary>
-    ///   <para>
-    ///     Example of the old way of testing for exceptions.  This style would result in a passed
-    ///     test if any code in the method throws an exception. In the case where there is only
-    ///     one line, it is not a problem, but if there were multiple lines of code, the ThrowsExactly
-    ///     syntax is preferred.
-    ///   </para>
-    ///   <para>
-    ///     You may delete this method once you understand the new way of testing for exceptions.
-    ///   </para>
-    /// </summary>
-    [TestMethod]
-    [ExpectedException(typeof(FormulaFormatException))]
-    public void DELETEME_FormulaConstructor_TestNoTokens_Invalid()
-    {
-        _ = new Formula(string.Empty);
-    }
-
     // --- Tests for Valid Token Rule ---
 
+    /// <summary>
+    ///   Formula with an invalid symbol should throw an exception.
+    /// </summary>
     [TestMethod]
     public void FormulaConstructor_TestInvalidToken_Invalid()
     {
-        _ = new Formula("$");
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("$"));
     }
 
-    // --- Tests for Closing Parenthesis Rule
+    /// <summary>
+    ///   Formula with a variable and operators should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestVariableAndOperators_Valid()
+    {
+        _ = new Formula("x1+2");
+    }
 
-    // --- Tests for Balanced Parentheses Rule
-
-    // --- Tests for First Token Rule
+    // --- Tests for Closing Parenthesis Rule ---
 
     /// <summary>
-    ///   <para>
-    ///     Make sure a simple well formed formula is accepted by the constructor (the constructor
-    ///     should not throw an exception).
-    ///   </para>
-    ///   <remarks>
-    ///     This is an example of a test that is not expected to throw an exception.
-    ///     In other words, the formula "1+1" has a valid first token (and is otherwise also correct).
-    ///   </remarks>
+    ///   Formula missing a closing parenthesis should throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestMissingClosingParen_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("(1+2"));
+    }
+
+    /// <summary>
+    ///   Formula with properly matched parentheses should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestMatchedParentheses_Valid()
+    {
+        _ = new Formula("(1+2)*(3+4)");
+    }
+
+    // --- Tests for Balanced Parentheses Rule ---
+
+    /// <summary>
+    ///   Too many closing parentheses should throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestTooManyClosingParens_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("1+2)"));
+    }
+
+    /// <summary>
+    ///   Nested balanced parentheses should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestNestedParens_Valid()
+    {
+        _ = new Formula("((1+2)*(3-4))/5");
+    }
+
+    // --- Tests for First Token Rule ---
+
+    /// <summary>
+    ///   Make sure a simple well formed formula is accepted by the constructor.
     /// </summary>
     [TestMethod]
     public void FormulaConstructor_TestFirstTokenNumber_Valid()
@@ -135,9 +107,144 @@ public class FormulaSyntaxTests
         _ = new Formula("1+1");
     }
 
-    // --- Tests for  Last Token Rule ---
+    /// <summary>
+    ///   Formula starting with an operator should throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestFirstTokenOperator_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("+2*3"));
+    }
+
+    /// <summary>
+    ///   Formula starting with a variable should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestFirstTokenVariable_Valid()
+    {
+        _ = new Formula("x1+2");
+    }
+
+    /// <summary>
+    ///   Formula starting with a parenthesis should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestFirstTokenParen_Valid()
+    {
+        _ = new Formula("(2+3)*4");
+    }
+
+    // --- Tests for Last Token Rule ---
+
+    /// <summary>
+    ///   Formula ending with an operator should throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestLastTokenOperator_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("1+2+"));
+    }
+
+    /// <summary>
+    ///   Formula ending with a number should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestLastTokenNumber_Valid()
+    {
+        _ = new Formula("1+2");
+    }
+
+    /// <summary>
+    ///   Formula ending with a variable should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestLastTokenVariable_Valid()
+    {
+        _ = new Formula("1+x3");
+    }
+
+    /// <summary>
+    ///   Formula ending with a closing parenthesis should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestLastTokenParen_Valid()
+    {
+        _ = new Formula("1+(2*3)");
+    }
 
     // --- Tests for Parentheses/Operator Following Rule ---
 
+    /// <summary>
+    ///   Number followed directly by another number should throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestTwoNumbersInARow_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("1 2"));
+    }
+
+    /// <summary>
+    ///   Operator followed by a valid number should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestOperatorFollowedByNumber_Valid()
+    {
+        _ = new Formula("1+2");
+    }
+
+    /// <summary>
+    ///   Opening parenthesis followed by a number should be valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestParenFollowedByNumber_Valid()
+    {
+        _ = new Formula("(2+3)");
+    }
+
+    /// <summary>
+    ///   Closing parenthesis followed by a number should throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestClosingParenFollowedByNumber_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("(2+3)4"));
+    }
+
     // --- Tests for Extra Following Rule ---
+
+    /// <summary>
+    ///   Variable followed directly by another variable should throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestTwoVariablesInARow_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("x y"));
+    }
+
+    /// <summary>
+    ///   Variable followed by operator is valid.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestVariableFollowedByOperator_Valid()
+    {
+        _ = new Formula("a47+3");
+    }
+
+    /// <summary>
+    ///   Number followed by variable without operator should throw exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestNumberFollowedByVariable_Invalid()
+    {
+        Assert.ThrowsExactly<FormulaFormatException>(() => _ = new Formula("2x"));
+    }
+
+    /// <summary>
+    ///   Complex but valid formula should be accepted.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestComplexValidFormula_Valid()
+    {
+        _ = new Formula("((x1+2)*(y3-4))/z5");
+    }
 }

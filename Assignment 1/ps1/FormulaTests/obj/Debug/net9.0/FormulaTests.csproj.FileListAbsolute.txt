@@ -384,3 +384,4 @@
 /Users/alexcarrasco/cs3500/Assignment 1/ps1/FormulaTests/obj/Debug/net9.0/FormulaTests.pdb
 /Users/alexcarrasco/cs3500/Assignment 1/ps1/FormulaTests/obj/Debug/net9.0/FormulaTests.genruntimeconfig.cache
 /Users/alexcarrasco/cs3500/Assignment 1/ps1/FormulaTests/obj/Debug/net9.0/ref/FormulaTests.dll
+/Users/alexcarrasco/cs3500/Assignment 1/ps1/FormulaTests/obj/Debug/net9.0/FormulaTests.sourcelink.json
